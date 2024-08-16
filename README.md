@@ -123,9 +123,15 @@ You can also monitor the output in real-time:
 You can customize the behavior of the script by setting the following environment variables:
 
 BITAXE_IP: The IP address of the Bitaxe device.
+
 TEMP_THRESHOLD: The temperature threshold (in Celsius) above which the script will attempt to lower the frequency.
+
 FIRST_FREQUENCY: The initial frequency level to set when the temperature exceeds the threshold.
+
 SECOND_FREQUENCY: The lower frequency level to set if the temperature remains high after the first adjustment.
+
 MAX_FREQUENCY: The maximum frequency level that the script will attempt to restore if the temperature is stable.
+
 CHECK_INTERVAL: The interval (in seconds) between temperature checks.
+
 STABLE_TIMEFRAME: The timeframe (in hours) used to assess temperature stability before considering increasing the frequency again.
