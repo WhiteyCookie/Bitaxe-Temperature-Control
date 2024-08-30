@@ -89,9 +89,9 @@ Add the following content:
     Restart=always
     User=pi
     Environment=BITAXE_IP=http://192.168.2.117
-    Environment=TEMP_THRESHOLD=63
-    Environment=FIRST_FREQUENCY=490
-    Environment=SECOND_FREQUENCY=400
+    Environment=TEMP_THRESHOLD=65
+    Environment=FIRST_FREQUENCY=500
+    Environment=SECOND_FREQUENCY=410
     Environment=CHECK_INTERVAL=300
 
     [Install]
