@@ -11,14 +11,14 @@ BITAXE_IP = os.getenv("BITAXE_IP", "http://192.168.2.117")
 API_INFO_ENDPOINT = f"{BITAXE_IP}/api/system/info"
 API_PATCH_ENDPOINT = f"{BITAXE_IP}/api/system"
 API_RESTART_ENDPOINT = f"{BITAXE_IP}/api/system/restart"
-TEMP_THRESHOLD = int(os.getenv("TEMP_THRESHOLD", 62))
+TEMP_THRESHOLD = int(os.getenv("TEMP_THRESHOLD", 65))
 FIRST_FREQUENCY = int(os.getenv("FIRST_FREQUENCY", 500))
 SECOND_FREQUENCY = int(os.getenv("SECOND_FREQUENCY", 410))
 CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", 300))  # 5 minutes by default
-MAX_FREQUENCY = 590
+MAX_FREQUENCY = 575
 STABLE_TIMEFRAME = timedelta(hours=1)
 
-TEMP_INCREASE_THRESHOLD = 57
+TEMP_INCREASE_THRESHOLD = 64
 
 # Initialize temperature history deque with an appropriate maxlen
 temperature_history = deque(maxlen=int(STABLE_TIMEFRAME.total_seconds() // CHECK_INTERVAL))
@@ -104,6 +104,16 @@ def monitor_and_adjust():
                 frequency = system_info["frequency"]
 
                 print_log(f"Current Temperature: {temperature}°C at frequency {frequency} MHz")
+
+                # Ensure frequency does not exceed MAX_FREQUENCY
+                if frequency > MAX_FREQUENCY:
+                    print_log(f"Frequency {frequency} MHz exceeds maximum allowed {MAX_FREQUENCY} MHz. Adjusting down.")
+                    if patch_frequency(MAX_FREQUENCY):
+                        restart_system()
+                        current_frequency = MAX_FREQUENCY
+                        last_adjustment_time = datetime.now()
+                        continue  # Skip to the next loop iteration after adjustment
+
                 temperature_history.append((temperature, datetime.now()))
 
                 if temperature > TEMP_THRESHOLD:
@@ -119,7 +129,7 @@ def monitor_and_adjust():
                       datetime.now() - last_adjustment_time > STABLE_TIMEFRAME and
                       check_temperature_stability()):
                     if current_frequency < MAX_FREQUENCY:
-                        new_frequency = min(current_frequency + 50, MAX_FREQUENCY)
+                        new_frequency = min(current_frequency + 25, MAX_FREQUENCY)
                         print_log(f"Temperature stable, increasing frequency to {new_frequency} MHz...")
                         if patch_frequency(new_frequency):
                             restart_system()
@@ -133,6 +143,7 @@ def monitor_and_adjust():
             print_log(f"An error occurred in the monitoring loop: {e}")
 
         time.sleep(CHECK_INTERVAL)
+
 
 if __name__ == "__main__":
     try:
